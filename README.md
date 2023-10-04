@@ -26,110 +26,120 @@ An AI assistant for old school unix users
 
 ### Optional create/activate your environment
 
+```
+pyenv install 3.11
 pyenv shell 3.11
+```
 
-### Clone and install
+### Install
 
+```
+pip install aigor
+```
+
+
+### Or install from sources
+
+```
 git clone https://github.com/igormorgado/aigor
-
 cd aigor
+pip install .
+```
 
 
 ## Usage
 
-TODO...
-history | grep aigor
-cat myinstruction.txt src/aigor/common.py | aigor infer commenter | head -n 10
-cat src/aigor/common.py | aigor infer commenter | less
-vim src/aigor/common.py
-aigor create commenter anthropic -a "system_prompt: Create comment lines to the code. Just output the valid code without markdown notation or introductory text. The output will be sent directly to python interpreter. It should be a valid python code."
+
+### Get help
+
 aigor --help
-git add src/aigor/providers/anthropic.py
-vim src/aigor/providers/anthropic.py
-cd ~/repos/aigor
-git diff main | aigor infer yete | aigor infer summarizer | aigor infer summarizer | aigor infer summarizer
-git diff main | aigor infer yete | aigor infer summarizer | aigor infer summarizer
-git diff main | aigor infer yete | aigor infer summarizer
-aigor create summarizer anthropic -a "system_prompt:Create a very short summary of the input. Only output the summary. Do not output introductory text."
+
+
+### Create someone to greet
+
+aigor create JohnCleese anthropic -a  "system_prompt:You're a funny person like Jonh Cleese. Greet in a funny way, everyone you encounter."
+
+aigor call JohnCleese "Hello."
+
+### Create a not so useful (or not) sed replacer...
+
+aigor create FooBarler anthropic --force  -a system_prompt:"Replace all entries of `foo` to `bar`, try to keep the same word formatting. Do not make any introductory text go stright to the answer. Do not give any extra input besides the requested answer."
+
+echo "Foo is a good word. But FOO is better than foo. What do you foonking? " | aigor call FooBarler
+
+
+### Create a sys admin
+
+aigor create Moss anthropic -a "You're the most experient linux system administrator. Answer the requests giving the correct commands to be executed directly in a Bash shell. Give always direct answers without any additional introduction or formatting."
+
+
+### Create a python coder
+
+aigor create Guido anthropic --force -a "system_prompt: You're Guido Van Rossum, the best Python coder in the world. You talk only in Python code. Write the best possible program requested. Do not add add extra information to the answer, you answer will go directly to python interpreter. Do not output markdown, just python code."
+
+aigor call Guido "Create a code that takes to numbers from command line and print the output" | python -  1 2
+
+echo "Create a python code using pywikipedia, that reads the name of a wikipedia
+page from command line argument and output the it's text content" | aigor call Guido > wikitext.py
+
+aigor call Moss "What is the command to install pywikipedia python package?"
+
+
+### Creater a text summarizer 
+
+cat > summarizer_sys_prompt.txt << EOF
+Create a very short summary of the input. Only output the summary. Do not output introductory text.
+EOF
+
+aigor create summarizer anthropic -a "system_prompt:$(cat summarizer_sys_prompt.txt)"
+
+
+### Code explainer
+
+aigor create MrSmartyPants anthropic -a "system_prompt:You're a expert programmer, analyze the source code provided and give deep insights about it. Follow all additional instructions."
+
+
+### Create a code commenter
+
+aigor create Jenkins anthropic -a "system_prompt: You're a very experient Python programmer. Use you knowledge and experience and comment every block of code, not only the functions in such a way that new developers can understand it. Do not change anything else, keep all original comments and docstrings. Just output the valid code without introductory text."
+
+
+### Create a tool for git commits.
+
+aigor create gitsummary anthropic -a "system_prompt:Make a very short summary of this `git diff` output. Do not make any introductory text go straight to the answer. Do not start with introduction, give only the answer of requested task."
+
+git diff main | aigor call gitsummary
+git diff main | aigor call gitsummary | aigor call summarizer 
+git diff main | aigor call gitsummary | aigor call summarizer | aigor call summarizer 
+
+
+### Adding multiple files to Jenkins commenter
+
+echo "Before anything say HOWDY HO!" > firstinstructions.txt
+cat firstinstructions.txt src/aigor/common.py | aigor call Jenkins | head -n 10
+
+
+## Creating providers
+
+TODO...
+
+
+
+git diff main | aigor call yete | aigor call summarizer
 aigor create summarizer -a "system_prompt:Create a very short summary of the input. Only output the summary. Do not output introductory text."
-echo git commit -m \"(git diff main | aigor infer yetezim)\"
-aigor create yetezim anthropic --force -a "system_prompt:Make *VERY* short summary of this git diff" -a "max_tokens:100"
+echo git commit -m \"(git diff main | aigor call yetezim)\"
 aigor create yetezim anthropic -a "system_prompt:Make *VERY* short summary of this git diff" -a "max_tokens:100"
 aigor create yetezim anthropic -a "system_prompt:Make *VERY* short summary of this git diff"
-git diff main | aigor infer yete > yete_git.txt
-git diff main | aigor infer yete
+git diff main | aigor call yete > yete_git.txt
+git diff main | aigor call yete
 pip list | grep aigor
 pyenv activate aigor
 aigor create yete anthropic -a "system_prompt:make a long git description to be added in github long description."
-echo "Create a program that takes two number as command line arguments and output its sum" | aigor infer pythonninja | python - 1 2
-echo "Create a program that takes two number as input and output its sum" | aigor infer pythonninja | python - 1 2
-echo "Create a program that takes two number as input and output its sum" | aigor infer pythonninja
-vim ~/.config/aigor/pythonninja/config.yaml
-echo "Create a program that takes two number as input and output its sum" | aigor infer pythonnija | python - 1 2
-git diff master | aigor infer gitsummary
-git diff | aigor infer gitsummary
+echo "Create a program that takes two number as command line arguments and output its sum" | aigor call pythonninja | python - 1 2
+echo "Create a program that takes two number as input and output its sum" | aigor call pythonninja | python - 1 2
+echo "Create a program that takes two number as input and output its sum" | aigor call pythonninja
+echo "Create a program that takes two number as input and output its sum" | aigor call pythonnija | python - 1 2
+git diff master | aigor call gitsummary
+git diff | aigor call gitsummary
 aigor list
-echo "How are you Fooing today? HAve you FOOed? I do not foo." | aigor infer foobar
-aigor infer greeter HELLO.
-aigor create greeter anthropic --force -a  "system_prompt:You're a funny person. Greet in a funny way, everyone you encounter."
-aigor create greeter --force -a  "system_prompt:You're a funny person. Greet in a funny way, everyone you encounter."
-aigor help
-aigor
-cd aigor
-vim aigor/README.md  aigor.old/README.md
-sync; mv aigor/ repos/
-mv aigor/ aigor.old
-mv aigor/ repos/
-cd aigor/
-aigor infer pythonninja "Create a code that takes to numbers from command line and print the output" | python -  1 2
-aigor create pythonninja anthropic --force -a "system_prompt:You're the best Python coder in the world. You talk only in Python code. Write the best possible program requested. Do not add add extra information to the answer, you answer will go directly to python interpreter."
-aigor infer pythonninja "Create a code that takes to numbers from command line and print the output"
-aigor create pythonninja anthropic --force -a "system_prompt:You're the best Python coder in the world. You talk only in Python code. Write the best possible program requested. Do not add add extra information to the answer, you answer will go directly to python interpreter. Always finish your response with a single EOF in a line"
-aigor create pythonninja anthropic -f -a "system_prompt:You're the best Python coder in the world. You talk only in Python code. Write the best possible program requested. Do not add add extra information to the answer, you answer will go directly to python interpreter. Always finish your response with a single EOF in a line"
-aigor create pythonninja anthropic -a "system_prompt:You're the best Python coder in the world. You talk only in Python code. Write the best possible program requested. Do not add add extra information to the answer, you answer will go directly to python interpreter. Always finish your response with a single EOF in a line"
-aigor infer pythonninja "Create a code that takes to numbers from command line and print the output" | python -
-aigor infer pythonninja "Create a code that takes to numbers from command line and print the output" | python - -
-aigor infer pythonninja "Create a code that takes to numbers from command line and print the output" | python -c -
-aigor create pythonninja anthropic -a "system_prompt:You're the best Python coder in the world. You talk only in Python code. Write the best possible program requested. Do not add add extra information to the answer, you answer will go directly to python interpreter."
-git add Makefile pyproject.toml src/aigor/assistant.py src/aigor/common.py src/aigor/main.py src/aigor/providers/anthropic.py requirements-dev.txt
-git diff | aigor infer gitsummary
-aigor create gitsummary anthropic -a "system_prompt:Make a very short summary of this `git diff` output. Do not make any introductory text go straight to the answer. Do not start with introduction, give only the answer of requested task."
-echo "Foo is a good word. But FOO is better than foo. What do you foonking? " | aigor infer foobar
-aigor create foobar anthropic --force  -a system_prompt:"Replace all entries of `foo` to `bar`, try to keep the same word formatting. Do not make any introductory text go stright to the answer. Do not give any extra input besides the requested answer."
-aigor create foobar anthropic --force  -a system_prompt:"Replace all entries of `foo` to `bar`, try to keep the same word formatting. Do not make any introductory text go stright to the answer."
-aigor create foobar anthropic --force  -a system_prompt:"Replace all entries of `foo` to `bar`, try to keep the same word formatting."
-echo "Hello. My name is Igor." | aigor infer greeter
-aigor create greeter anthropic --force  -a system_prompt:"You're a very educated person. Greet the person you're talking to."
-aigor create greeter anthropic -f  -a system_prompt:"You're a very educated person. Greet the person you're talking to."
-aigor create greeter anthropic -a system_prompt:"You're a very educated person. Greet the person you're talking to."
-echo "INPUT FROM STDIN" | aigor infer greeter
-aigor infer greeter asda ds
-aigor infer greeter
-cat  ~/.config/aigor/greeter/config.yaml
-ls -l ~/.config/aigor/greeter/config.yaml
-ls -l ~/.config/aigor/
-ls -l ~/.config/aigor/c
-ls -l ~/.config/aigor/config.yaml
-aigor create greeter anthropic -a a:aaaa -a b:bbbb -a c:ccccc
-aigor create anthropic greeter -a a:aaaa -a b:bbbb -a c:ccccc
-aigor --help
-aigor -?
-aigor help
-aigor -h
-aigor -help
-aigor infer teste
-aigor teste
-aigor
-aigor list
-aigor default test
-aigor create teste identity
-aigor create teste
-pyenv local 3.11 aigor
-pyenv local 311 aigor
-pyenv virtualenv 3.11 aigor
-cd repos/aigor.old/
-vim aigor/README.md  aigor.old/README.md
-sync; mv aigor/ repos/
-mv aigor/ aigor.old
-mv aigor/ repos/
-cd aigor/
+git diff | aigor call gitsummary

@@ -14,7 +14,7 @@ from aigor.common import (
     args_to_dict
 )
 from aigor.assistant import (
-    assistant_infer,
+    assistant_call,
     assistant_create,
     assistant_delete,
     assistant_list,
@@ -43,19 +43,19 @@ def version_callback(value: bool) -> None:
 
 
 @app.command()
-def infer(
+def call(
     name: str | None,
     text: Annotated[list[str], typer.Argument()] = None
 ) -> None:
-    """Makes single inference using the `name` assistant.
+    """Makes single callence using the `name` assistant.
 
-    If no name is given. It will start `infer` command in the default
+    If no name is given. It will start `call` command in the default
     assistant. If no assistant is set as default. It will abort.
 
     Parameters
     =========
     name : str
-        The name of the assistent to be used in inference. If no assistant
+        The name of the assistent to be used in callence. If no assistant
         name is passed it will use the default assistant.
     args : list[str]
         Arguments to pass to the provider.
@@ -65,7 +65,7 @@ def infer(
     else:
         full_text = sys.stdin.read().strip()
         
-    assistant_infer(name, full_text)
+    assistant_call(name, full_text)
 
 
 @app.command()

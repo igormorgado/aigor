@@ -169,18 +169,18 @@ def assistant_is_valid(name: str) -> bool:
     return True
 
 
-def assistant_infer(name: str | None, text: str) -> None:
-    """Makes inference using the `name` assistant.
+def assistant_call(name: str | None, text: str) -> None:
+    """Makes callence using the `name` assistant.
 
     Parameters
     =========
     name : str
-        The name of the assistent to be used in inference. If no assistant
+        The name of the assistent to be used in callence. If no assistant
         name is passed it will use the default assistant.
     text : str
         The text to be sent to the provider.
     """
-    logging.debug(f"infer {name}")
+    logging.debug(f"call {name}")
     config = assistant_config_read(name)
     logging.debug(f"CONFIG: {config}")
     logging.debug(f"TEXT: {text}")
