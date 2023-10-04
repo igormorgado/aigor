@@ -28,6 +28,7 @@ maintainers = [
 
 [project.optional-dependencies]
 dev = [
+  "spinx",
   "pytest",
   "pylint",
   "mypy",

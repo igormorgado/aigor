@@ -3,6 +3,7 @@
 *.pyo
 *.pyd
 *.egg-info/
+.vscode
 build/
 __pycache__/
 .mypy_cache/

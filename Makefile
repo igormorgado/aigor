@@ -1,7 +1,15 @@
-.PHONY: clean
+SPHINXOPTS    =
+SPHINXBUILD   = sphinx-build
+SOURCEDIR     = docs/source
+BUILDDIR      = docs/build
+
+.PHONY: clean help Makefile
 
 reinstall: clean uninstall install
 	@echo "DONE"
+
+help:
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 install:
 	pip install .
@@ -19,6 +27,11 @@ test:
 	mypy src/aigor
 	pylint src/aigor
 	pytest -v -s
+	
+PHONY: doc
+doc:
+	# sphinx-build -b html docs/source docs/build
+	sphinx-apidoc -f -o  docs/source src/aigor
 
 clean:
 	@echo "Cleaning Python cache files..."
@@ -32,3 +45,5 @@ clean:
 	@find . -type f -name "*.pyd" -delete
 	@echo "Done!"
 
+%: Makefile
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
