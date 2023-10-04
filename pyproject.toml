@@ -8,6 +8,12 @@ dynamic = ["version"]
 description = "AIgor is an assistant for oldshol unix users."
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = [
+  "python-dotenv",
+  "colorlog",
+  "typer",
+  "anthropic",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -20,9 +26,14 @@ maintainers = [
   {'name' = 'Igor Morgado', 'email' = "morgado.igor@gmail.com"},
 ]
 
+[tool.setuptools.dynamic]
+version = {attr = "aigor.__version__"}
+#dependencies = {file = ["requirements.txt"]}
+
+
 [project.optional-dependencies]
-dev = [
-  "spinx",
+dev =  [
+  "sphinx",
   "pytest",
   "pylint",
   "mypy",
@@ -33,9 +44,7 @@ dev = [
   "types-PyYAML",
 ]
 
-[tool.setuptools.dynamic]
-version = {attr = "aigor.__version__"}
-dependencies = {file = ["requirements.txt"]}
+
 
 [project.scripts]
 aigor = "aigor.main:app"

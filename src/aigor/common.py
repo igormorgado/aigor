@@ -26,7 +26,13 @@ def setup_logging(verbose: bool = False) -> None:
     =======
     None
     """
-    level = logging.DEBUG if verbose else logging.INFO
+    if verbose:
+        level = logging.DEBUG
+        logging.getLogger("anthropic").setLevel(logging.DEBUG)
+    else:
+        level = logging.WARNING
+        logging.getLogger("anthropic").setLevel(logging.WARNING)
+
     console = Console(file=sys.stderr)
     rich_handler = RichHandler(
         console=console,

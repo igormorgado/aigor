@@ -43,7 +43,10 @@ def version_callback(value: bool) -> None:
 
 
 @app.command()
-def infer(name: str | None) -> None:
+def infer(
+    name: str | None,
+    text: Annotated[list[str], typer.Argument()] = None
+) -> None:
     """Makes single inference using the `name` assistant.
 
     If no name is given. It will start `infer` command in the default
@@ -54,8 +57,15 @@ def infer(name: str | None) -> None:
     name : str
         The name of the assistent to be used in inference. If no assistant
         name is passed it will use the default assistant.
+    args : list[str]
+        Arguments to pass to the provider.
     """
-    assistant_infer(name)
+    if text:
+        full_text = " ".join(text)
+    else:
+        full_text = sys.stdin.read().strip()
+        
+    assistant_infer(name, full_text)
 
 
 @app.command()
@@ -220,7 +230,7 @@ def main(
 
     if version:
         version_callback(True)
-
+    
     setup_logging(verbose)
     logging.debug("Set verbose")
 

@@ -9,13 +9,25 @@ reinstall: clean uninstall install
 	@echo "DONE"
 
 help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@echo "Available targets:"
+	@echo "  reinstall  - Clean, uninstall, and reinstall the package"
+	@echo "  install    - Install the package"
+	@echo "  dev        - Uninstall and install the package in editable mode"
+	@echo "  uninstall  - Uninstall the package"
+	@echo "  upgrade    - Upgrade the package"
+	@echo "  test       - Run mypy, pylint, and pytest"
+	@echo "  doc        - Generate API documentation and build HTML"
+	@echo "  clean      - Remove Python cache files and build artifacts"
+	@echo "  help       - Show this help message"
+
+# help:
+# 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 install:
 	pip install .
 
-edit: uninstall
-	pip install -e .
+dev: uninstall
+	pip install -e .[dev]
 
 uninstall:
 	pip uninstall -y aigor

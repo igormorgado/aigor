@@ -13,7 +13,7 @@ from aigor.common import (
     config_read,
     config_write
 )
-from aigor.provider import provider_is_valid
+from aigor.provider import provider_is_valid, provider_get_func
 
 
 def assistant_name(name: str) -> str:
@@ -169,7 +169,7 @@ def assistant_is_valid(name: str) -> bool:
     return True
 
 
-def assistant_infer(name: str | None) -> None:
+def assistant_infer(name: str | None, text: str) -> None:
     """Makes inference using the `name` assistant.
 
     Parameters
@@ -177,8 +177,21 @@ def assistant_infer(name: str | None) -> None:
     name : str
         The name of the assistent to be used in inference. If no assistant
         name is passed it will use the default assistant.
+    text : str
+        The text to be sent to the provider.
     """
-    logging.info(f"infer {name}")
+    logging.debug(f"infer {name}")
+    config = assistant_config_read(name)
+    logging.debug(f"CONFIG: {config}")
+    logging.debug(f"TEXT: {text}")
+    provider_func = provider_get_func(config['provider'])
+    if provider_func is None:
+        logging.error(f"Provider {config['provider']} not found.")
+        raise typer.Abort()
+    provider_args = config.get('provider_args', {})
+    result = provider_func(text, provider_args)
+    logging.debug(f"RESULT: {result}")
+    print(result)
 
 
 def assistant_create(

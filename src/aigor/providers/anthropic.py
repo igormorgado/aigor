@@ -1,5 +1,6 @@
 """Defines the anthropic provider."""
 
+from typing import Any
 from anthropic import Anthropic
 from anthropic.types import TextBlock, ToolUseBlock
 
@@ -18,7 +19,7 @@ def claude_api_request(
     Parameters
     ==========
     user_prompt : str
-        The user prompt. Normaly is what is sent from STDIN.
+        The user prompt.
     system_prompt: str = "",
         Prompt that prepares the model for some task.
     temperature: float = 0.7,
@@ -31,6 +32,11 @@ def claude_api_request(
 
     client = Anthropic()
 
+    logging.debug(f"user_prompt: {user_prompt}")
+    logging.debug(f"system_prompt: {system_prompt}")
+    logging.debug(f"temperature: {temperature}")
+    logging.debug(f"max_tokens: {max_tokens}")
+    logging.debug(f"model: {model}")
     message = client.messages.create(
         model=model,
         max_tokens=max_tokens,
@@ -52,7 +58,13 @@ def claude_api_request(
     return content
 
 
-def run(data: str) -> str:
+def run(data: str, config: dict[str, Any]) -> str:
     """Executes the anthropic provider."""
-    result = claude_api_request(data)
+    # HEre we will cleanup only the valid config args.
+    logging.debug(f"config: {config}")
+    valid_args = ['system_prompt', 'temperature', 'max_tokens', 'model']
+    cleaned_config = {k: v for k, v in config.items() if k in valid_args}
+    logging.debug(f"cleaned_config: {cleaned_config}")
+    user_prompt = data
+    result = claude_api_request(user_prompt, **cleaned_config)
     return result

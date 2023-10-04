@@ -1,0 +1,9 @@
+sphinx
+pytest
+pylint
+mypy
+ipython
+ipdb
+pytest-mypy
+setuptools-scm
+types-PyYAML
