@@ -3,5 +3,7 @@
 *.pyo
 *.pyd
 *.egg-info/
-__pycache__/
 build/
+__pycache__/
+.mypy_cache/
+.pytest_cache/

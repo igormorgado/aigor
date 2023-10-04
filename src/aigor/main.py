@@ -124,11 +124,9 @@ def create(
         typer.Option(
             "-a",
             "--args",
-            help=(
-                "Arguments to pass to provider. "
-                "Can specify multiple times. "
-                "Must be in form 'key:value'.",
-            ),
+            help=("Arguments to pass to provider. "
+                  "Can specify multiple times. "
+                  "Must be in form 'key:value'."),
             show_default=False,
         )
     ] = None
