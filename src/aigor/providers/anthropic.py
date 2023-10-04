@@ -29,7 +29,10 @@ def claude_api_request(
     model: str = "claude-3-sonnet-20240229"
         Model name to request from.
     """
-
+    # This should be fixed in input, not here.
+    max_tokens = int(max_tokens)
+    temperature = float(temperature)
+    
     client = Anthropic()
 
     logging.debug(f"user_prompt: {user_prompt}")
