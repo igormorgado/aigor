@@ -4,7 +4,6 @@ import sys
 from rich.logging import RichHandler
 import logging
 from rich.console import Console
-import colorlog
 from pathlib import Path
 from typing import Callable, TextIO, Any
 import yaml
@@ -28,23 +27,25 @@ def setup_logging(verbose: bool = False) -> None:
     None
     """
     level = logging.DEBUG if verbose else logging.INFO
-    handler = colorlog.StreamHandler(sys.stderr)
-    handler.setFormatter(colorlog.ColoredFormatter(
-        '%(asctime)s %(log_color)s%(levelname)-8s:%(reset)s %(message)s',
-        log_colors={
-            'DEBUG': 'blue',
-            'INFO': 'green',
-            'WARNING': 'yellow',
-            'ERROR': 'red',
-            'CRITICAL': 'red,bg_white',
-        }
-    ))
+    console = Console(file=sys.stderr)
+    rich_handler = RichHandler(
+        console=console,
+        rich_tracebacks=True,
+        markup=True,
+        show_path=False,
+        show_time=True,
+        omit_repeated_times=False,
+    )
+    rich_handler.setLevel(level)
 
-    logger = colorlog.getLogger()
-    logger.addHandler(handler)
-    logger.setLevel(level)
+    logging.basicConfig(
+        level=level,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[rich_handler]
+    )
 
-    # Remove any existing handlers (to avoid duplicate output)
+    logger = logging.getLogger()
     for handler in logger.handlers[:]:
         if isinstance(handler, logging.StreamHandler) and handler.stream == sys.stdout:
             logger.removeHandler(handler)
