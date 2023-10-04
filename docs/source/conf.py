@@ -1,5 +1,6 @@
 import os
 import sys
+import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath('../../src'))
 
 # Configuration file for the Sphinx documentation builder.
@@ -26,5 +27,11 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
+
 html_theme = 'alabaster'
+html_theme_options = {
+    'logo': 'aigor.png',
+    'github_user': 'igormorgado',
+    'github_repo': 'aigor',
+}
 html_static_path = ['_static']

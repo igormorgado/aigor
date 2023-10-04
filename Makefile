@@ -3,7 +3,7 @@ SPHINXBUILD   = sphinx-build
 SOURCEDIR     = docs/source
 BUILDDIR      = docs/build
 
-.PHONY: clean help Makefile
+.PHONY: clean help Makefile doc build
 
 reinstall: clean uninstall install
 	@echo "DONE"
@@ -40,7 +40,15 @@ test:
 	pylint src/aigor
 	pytest -v -s
 	
-PHONY: doc
+upload-test: test
+	twine upload --repository testpypi dist/*
+
+upload: upload-test
+	twine upload dist/*
+
+build: clean
+	python -m build
+
 doc:
 	# sphinx-build -b html docs/source docs/build
 	sphinx-apidoc -f -o  docs/source src/aigor
