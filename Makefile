@@ -32,6 +32,7 @@ PHONY: doc
 doc:
 	# sphinx-build -b html docs/source docs/build
 	sphinx-apidoc -f -o  docs/source src/aigor
+	make html
 
 clean:
 	@echo "Cleaning Python cache files..."
