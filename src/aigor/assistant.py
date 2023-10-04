@@ -108,7 +108,7 @@ def assistant_config_read(name: str) -> dict[str, Any]:
     dict[str, Any]
         The configuration contents. Or none if does not exists.
     """
-    config = {}
+    config: dict[str, Any] = {}
     try:
         assistant_dir = assistant_path(name)
         assistant_config = assistant_dir / "config.yaml"

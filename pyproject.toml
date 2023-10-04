@@ -13,12 +13,12 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-  'typer',
-  'rich',
-  'python-dotenv',
-  'anthropic',
-]
+# dependencies = [
+#   'typer',
+#   'rich',
+#   'python-dotenv',
+#   'anthropic',
+# ]
 authors = [
   {'name' = 'Igor Morgado', 'email' = "morgado.igor@gmail.com"},
 ]
@@ -41,6 +41,7 @@ dev = [
 
 [tool.setuptools.dynamic]
 version = {attr = "aigor.__version__"}
+dependencies = {file = ["requirements.txt"]}
 
 [project.scripts]
 aigor = "aigor.main:app"
