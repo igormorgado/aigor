@@ -51,7 +51,7 @@ def version_callback(value: bool) -> None:
 def infer(name: str | None) -> None:
     """Makes single inference using the `name` assistant.
 
-    If no command is given. It will start `infer` command in the default
+    If no name is given. It will start `infer` command in the default
     assistant. If no assistant is set as default. It will abort.
 
     Parameters
