@@ -34,7 +34,7 @@ Homepage = "https://github.com/igormorgado/aigor"
 version = {attr = "aigor.__version__"}
 
 [project.optional-dependencies]
-dev =  [
+dev = [ 
   "sphinx",
   "pytest",
   "pylint",
