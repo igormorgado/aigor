@@ -4,16 +4,11 @@
 import sys
 from typing_extensions import Annotated
 import typer
-from aigor import (
-    __version__,
-    __appname__,
-    state_get,
-    state_set,
-)
+
+from aigor import __version__, __appname__
 from aigor.common import (
-    log_debug,
-    log_info,
-    log_error,
+    logging,
+    setup_logging,
     # process_stdin,
     search_and_load_dotenv,
     args_to_dict
@@ -200,7 +195,7 @@ def default_set(name: str) -> None:
 def main(
     ctx: typer.Context,
     verbose: Annotated[
-        bool | None,
+        bool,
         typer.Option(
             "--verbose",
             "-v",
@@ -226,31 +221,34 @@ def main(
     if version:
         version_callback(True)
 
-    if verbose:
-        log_debug("Set verbose")
-        state_set("verbose", True)
+    setup_logging(verbose)
+    logging.debug("Set verbose")
 
     search_and_load_dotenv()
 
     if ctx.invoked_subcommand is None:
         assistant = assistant_default_get()
 
-        if state_get("verbose"):
-            log_debug(f"Calling default assistant {assistant}.")
+        logging.debug(f"Calling default assistant {assistant}.")
 
         if assistant:
             provider_func = provider_get_func(assistant)
         else:
-            log_error("Could not find default assistant")
+            logging.error("Could not find default assistant")
             raise typer.Abort()
 
+        logging.debug(f"Default assistant {assistant}")
+        logging.debug(f"provider_func {provider_func}")
+
+        # Extra message for terminals.
         if sys.stdin.isatty():
-            log_info("Reading from terminal. CTRL-D to finish.")
+            logging.info("Reading from terminal. CTRL-D to finish.")
+
         # process_stdin(provider_func, sys.stdin, sys.stdout)
-        log_debug(f"provider_func {provider_func}")
-        log_info(f"Default assistant {assistant}")
+
+        # Extra message for terminals.
         if sys.stdin.isatty():
-            log_info("Bye. :wave:")
+            logging.info("Bye. :wave:")
 
 
 if __name__ == "__main__":

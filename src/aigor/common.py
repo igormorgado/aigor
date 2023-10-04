@@ -1,58 +1,53 @@
 """Commom utilities"""
 
+import sys
+from rich.logging import RichHandler
+import logging
+from rich.console import Console
+import colorlog
 from pathlib import Path
 from typing import Callable, TextIO, Any
 import yaml
 from dotenv import load_dotenv
 
 import typer
-from rich import print as rprint
 
-from aigor import __appname__, state_get
-
-
-def log_warn(message: str) -> None:
-    """Print a warn message.
-
-    Parameters
-    ==========
-    message : str
-        The message
-    """
-    rprint(f"[bold yellow]WARNING[/bold yellow]: {message}")
+from aigor import __appname__
 
 
-def log_info(message: str) -> None:
-    """Print a info message.
+def setup_logging(verbose: bool = False) -> None:
+    """Setups logging based on `verbose` flag.
 
     Parameters
     ==========
-    message : str
-        The message
+    verbose : bool
+        If True will set logging level to DEBUG, if False will set to INFO.
+
+    Returns
+    =======
+    None
     """
-    rprint(f"[bold blue]INFO[/bold blue]: {message}")
+    level = logging.DEBUG if verbose else logging.INFO
+    handler = colorlog.StreamHandler(sys.stderr)
+    handler.setFormatter(colorlog.ColoredFormatter(
+        '%(asctime)s %(log_color)s%(levelname)-8s:%(reset)s %(message)s',
+        log_colors={
+            'DEBUG': 'blue',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'red,bg_white',
+        }
+    ))
 
+    logger = colorlog.getLogger()
+    logger.addHandler(handler)
+    logger.setLevel(level)
 
-def log_debug(message: str) -> None:
-    """Print a DEBUG message.
-
-    Parameters
-    ==========
-    message : str
-        The message
-    """
-    rprint(f"[bold purple]DEBUG[/bold purple]: {message}")
-
-
-def log_error(message: str) -> None:
-    """Print a, ERROR message.
-
-    Parameters
-    ==========
-    message : str
-        The message
-    """
-    rprint(f"[bold red]ERROR[/bold red]: {message}")
+    # Remove any existing handlers (to avoid duplicate output)
+    for handler in logger.handlers[:]:
+        if isinstance(handler, logging.StreamHandler) and handler.stream == sys.stdout:
+            logger.removeHandler(handler)
 
 
 def get_app_dir() -> Path:
@@ -89,17 +84,15 @@ def search_and_load_dotenv() -> None:
     loaded_dotenv = False
     locations = [Path("."), Path.home()]
     for location in locations:
-        if state_get("verbose"):
-            log_debug(f"Trying to read .env from {location}")
+        logging.debug(f"Trying to read .env from {location}")
         if load_dotenv(location / ".env"):
             loaded_dotenv = True
             break
 
-    if state_get("verbose"):
-        if loaded_dotenv:
-            log_info(f"Loaded `.env` from {location}")
-        else:
-            log_warn("Could not find .env file.")
+    if loaded_dotenv:
+        logging.debug(f"Loaded `.env` from {location}")
+    else:
+        logging.warn("Could not find .env file.")
 
 
 def args_to_dict(args: list[str]) -> dict[str, str]:

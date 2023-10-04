@@ -7,13 +7,9 @@ from typing import Any
 import yaml
 import typer
 
-from aigor import state_get
 from aigor.common import (
+    logging,
     get_app_dir,
-    log_warn,
-    log_debug,
-    log_info,
-    log_error,
     config_read,
     config_write
 )
@@ -115,7 +111,7 @@ def assistant_config_read(name: str) -> dict[str, Any]:
         with open(assistant_config, "r", encoding="UTF-8") as file:
             config = yaml.safe_load(file)
     except (FileNotFoundError, PermissionError, IOError) as e:
-        log_error(f"Loading assistant {name} config: {e}")
+        logging.error(f"Loading assistant {name} config: {e}")
 
     return config
 
@@ -140,7 +136,7 @@ def assistant_config_write(name: str, config: dict[str, Any]) -> None:
         with open(assistant_config, "w", encoding="UTF-8") as file:
             yaml.dump(config, file, default_flow_style=False)
     except (FileNotFoundError, PermissionError, IOError) as e:
-        log_error(f"Loading assistant {name} config: {e}")
+        logging.error(f"Loading assistant {name} config: {e}")
 
 
 def assistant_is_valid(name: str) -> bool:
@@ -182,7 +178,7 @@ def assistant_infer(name: str | None) -> None:
         The name of the assistent to be used in inference. If no assistant
         name is passed it will use the default assistant.
     """
-    log_info(f"infer {name}")
+    logging.info(f"infer {name}")
 
 
 def assistant_create(
@@ -209,7 +205,7 @@ def assistant_create(
     """
     # Check if provider is valid
     if not provider_is_valid(provider):
-        log_error("Provider {provider} not valid.")
+        logging.error("Provider {provider} not valid.")
         raise typer.Abort()
 
     # Build assistant_dir from config path and name
@@ -218,20 +214,19 @@ def assistant_create(
     # If directory already exists. Do not create anything
     if assistant_dir.exists():
         if force:
-            log_info(f"Removing {assistant_dir}.")
+            logging.info(f"Removing {assistant_dir}.")
             shutil.rmtree(assistant_dir)
         else:
-            log_warn(f"Assistant {name} already exists.")
+            logging.warn(f"Assistant {name} already exists.")
             raise typer.Abort()
 
     # Try to create the directory. And handle issues.
     try:
         assistant_dir.mkdir(parents=True, exist_ok=True)
-        if state_get("verbose"):
-            log_debug(f"Created directory: {assistant_dir}")
-        log_info(f"Setting {name} to {provider}")
+        logging.debug(f"Created directory: {assistant_dir}")
+        logging.info(f"Setting {name} to {provider}")
     except OSError as e:
-        log_error(f"Error while creating assistant '{assistant_name(name)}': {e}")
+        logging.error(f"Error while creating assistant '{assistant_name(name)}': {e}")
 
     config: dict[str, Any] = {
         'name': name,
@@ -262,10 +257,9 @@ def assistant_delete(name: str) -> None:
     if assistant_dir.exists() and assistant_dir.is_dir():
         try:
             shutil.rmtree(assistant_dir)
-            if state_get("verbose"):
-                log_info(f"Assistant {name} deleted.")
+            logging.info(f"Assistant {name} deleted.")
         except OSError as e:
-            log_error(f"ERROR: deleting assistant {name}: {e}")
+            logging.error(f"ERROR: deleting assistant {name}: {e}")
 
 
 def assistant_list() -> None:
@@ -281,8 +275,7 @@ def assistant_list() -> None:
     if assistants:
         print("\n".join(assistants))
     else:
-        if state_get("verbose"):
-            log_error("No assistants were created yet.")
+        logging.error("No assistants were created yet.")
 
 
 def assistant_default_set(name: str) -> None:
@@ -320,7 +313,7 @@ def assistant_flush(name: str) -> None:
     name : str
         Name of the assistant without spaces.
     """
-    log_info(f"Flushing {name}")
+    logging.info(f"Flushing {name}")
 
 
 def assistant_chat(name: str) -> None:
@@ -333,4 +326,4 @@ def assistant_chat(name: str) -> None:
     name : str
         Name of the assistant without spaces.
     """
-    log_info(f"Chatting with {name}")
+    logging.info(f"Chatting with {name}")

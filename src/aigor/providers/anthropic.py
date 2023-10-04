@@ -3,8 +3,7 @@
 from anthropic import Anthropic
 from anthropic.types import TextBlock, ToolUseBlock
 
-from aigor import state_get
-from aigor.common import log_debug
+from aigor.common import logging
 
 
 def claude_api_request(
@@ -48,8 +47,7 @@ def claude_api_request(
         if isinstance(first_block, TextBlock):
             content = first_block.text
         elif isinstance(first_block, ToolUseBlock):
-            if state_get("verbose"):
-                log_debug("First block {dir(first_block)}")
+            logging.debug("First block {dir(first_block)}")
 
     return content
 
