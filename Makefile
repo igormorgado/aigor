@@ -43,7 +43,7 @@ test:
 upload-test: test
 	twine upload --repository testpypi dist/*
 
-upload: upload-test
+upload: build
 	twine upload dist/*
 
 build: clean
