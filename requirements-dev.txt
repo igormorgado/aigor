@@ -7,3 +7,6 @@ ipdb
 pytest-mypy
 setuptools-scm
 types-PyYAML
+build
+twine
+sphinx-rtd-theme

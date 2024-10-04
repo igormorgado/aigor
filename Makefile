@@ -30,7 +30,7 @@ dev: uninstall
 	pip install -e .[dev]
 
 uninstall:
-	pip uninstall -y aigor
+	pip uninstall -y aigor || echo "Not installed"
 
 upgrade:
 	pip install --upgrade .

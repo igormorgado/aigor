@@ -2,12 +2,13 @@
 """Main entrypoint for AIgor CLI. No logic here."""
 
 import sys
+import logging
 from typing_extensions import Annotated
+
 import typer
 
 from aigor import __version__, __appname__
 from aigor.common import (
-    logging,
     setup_logging,
     # process_stdin,
     search_and_load_dotenv,
@@ -45,7 +46,7 @@ def version_callback(value: bool) -> None:
 @app.command()
 def call(
     name: str | None,
-    text: Annotated[list[str], typer.Argument()] = None
+    text: Annotated[list[str] | None, typer.Argument()] = None
 ) -> None:
     """Makes single callence using the `name` assistant.
 
@@ -64,8 +65,17 @@ def call(
         full_text = " ".join(text)
     else:
         full_text = sys.stdin.read().strip()
-        
-    assistant_call(name, full_text)
+
+    assistant_name: str = ""
+    if isinstance(name, str):
+        assistant_name = str(name)
+    else:
+        assistant_name = assistant_default_get()
+
+    if not assistant_name:
+        raise ValueError("Assistant not defined")
+
+    assistant_call(assistant_name, full_text)
 
 
 @app.command()
@@ -230,7 +240,7 @@ def main(
 
     if version:
         version_callback(True)
-    
+
     setup_logging(verbose)
     logging.debug("Set verbose")
 
@@ -239,7 +249,7 @@ def main(
     if ctx.invoked_subcommand is None:
         assistant = assistant_default_get()
 
-        logging.debug(f"Calling default assistant {assistant}.")
+        logging.debug("Calling default assistant %s.",  assistant)
 
         if assistant:
             provider_func = provider_get_func(assistant)
@@ -247,8 +257,8 @@ def main(
             logging.error("Could not find default assistant")
             raise typer.Abort()
 
-        logging.debug(f"Default assistant {assistant}")
-        logging.debug(f"provider_func {provider_func}")
+        logging.debug("Default assistant %s.", assistant)
+        logging.debug("provider_func %s.", provider_func)
 
         # Extra message for terminals.
         if sys.stdin.isatty():

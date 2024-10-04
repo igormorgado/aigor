@@ -1,6 +1,7 @@
 """Real assistant functions."""
 
 import shutil
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -8,7 +9,6 @@ import yaml
 import typer
 
 from aigor.common import (
-    logging,
     get_app_dir,
     config_read,
     config_write
@@ -111,7 +111,7 @@ def assistant_config_read(name: str) -> dict[str, Any]:
         with open(assistant_config, "r", encoding="UTF-8") as file:
             config = yaml.safe_load(file)
     except (FileNotFoundError, PermissionError, IOError) as e:
-        logging.error(f"Loading assistant {name} config: {e}")
+        logging.error("Loading assistant %s config: %s", name, e)
 
     return config
 
@@ -136,7 +136,7 @@ def assistant_config_write(name: str, config: dict[str, Any]) -> None:
         with open(assistant_config, "w", encoding="UTF-8") as file:
             yaml.dump(config, file, default_flow_style=False)
     except (FileNotFoundError, PermissionError, IOError) as e:
-        logging.error(f"Loading assistant {name} config: {e}")
+        logging.error("Loading assistant %s config: %s", name, e)
 
 
 def assistant_is_valid(name: str) -> bool:
@@ -169,28 +169,27 @@ def assistant_is_valid(name: str) -> bool:
     return True
 
 
-def assistant_call(name: str | None, text: str) -> None:
+def assistant_call(name: str, text: str) -> None:
     """Makes callence using the `name` assistant.
 
     Parameters
     =========
     name : str
-        The name of the assistent to be used in callence. If no assistant
-        name is passed it will use the default assistant.
+        The name of the assistent to be used in callence. 
     text : str
         The text to be sent to the provider.
     """
-    logging.debug(f"call {name}")
+    logging.debug("call %s", name)
     config = assistant_config_read(name)
-    logging.debug(f"CONFIG: {config}")
-    logging.debug(f"TEXT: {text}")
+    logging.debug("CONFIG: %s", config)
+    logging.debug("TEXT: %s", text)
     provider_func = provider_get_func(config['provider'])
     if provider_func is None:
-        logging.error(f"Provider {config['provider']} not found.")
+        logging.error("Provider %s not found.", config['provider'])
         raise typer.Abort()
     provider_args = config.get('provider_args', {})
     result = provider_func(text, provider_args)
-    logging.debug(f"RESULT: {result}")
+    logging.debug("RESULT: %s", result)
     print(result)
 
 
@@ -227,19 +226,20 @@ def assistant_create(
     # If directory already exists. Do not create anything
     if assistant_dir.exists():
         if force:
-            logging.info(f"Removing {assistant_dir}.")
+            logging.info("Removing %s.", assistant_dir)
             shutil.rmtree(assistant_dir)
         else:
-            logging.warn(f"Assistant {name} already exists.")
+            logging.warning("Assistant %s already exists.", name)
             raise typer.Abort()
 
     # Try to create the directory. And handle issues.
     try:
         assistant_dir.mkdir(parents=True, exist_ok=True)
-        logging.debug(f"Created directory: {assistant_dir}")
-        logging.info(f"Setting {name} to {provider}")
+        logging.debug("Created directory: %s", assistant_dir)
+        logging.info("Setting %s to %s", name, provider)
     except OSError as e:
-        logging.error(f"Error while creating assistant '{assistant_name(name)}': {e}")
+        logging.error("Error while creating assistant '%s': %s",
+                      assistant_name(name), e)
 
     config: dict[str, Any] = {
         'name': name,
@@ -270,9 +270,9 @@ def assistant_delete(name: str) -> None:
     if assistant_dir.exists() and assistant_dir.is_dir():
         try:
             shutil.rmtree(assistant_dir)
-            logging.info(f"Assistant {name} deleted.")
+            logging.info("Assistant %s deleted.", name)
         except OSError as e:
-            logging.error(f"ERROR: deleting assistant {name}: {e}")
+            logging.error("ERROR: deleting assistant %s: %s", name, e)
 
 
 def assistant_list() -> None:
@@ -305,7 +305,7 @@ def assistant_default_set(name: str) -> None:
     config_write(config)
 
 
-def assistant_default_get() -> str | None:
+def assistant_default_get() -> str:
     """Get the name of default assistant.
 
     Returns
@@ -314,7 +314,7 @@ def assistant_default_get() -> str | None:
         Name of the assistant. Or None if not set
     """
     config = config_read()
-    default_assistant = config.get("default_assistant")
+    default_assistant = config.get("default_assistant", "")
     return default_assistant
 
 
@@ -326,7 +326,7 @@ def assistant_flush(name: str) -> None:
     name : str
         Name of the assistant without spaces.
     """
-    logging.info(f"Flushing {name}")
+    logging.info("Flushing %s", name)
 
 
 def assistant_chat(name: str) -> None:
@@ -339,4 +339,4 @@ def assistant_chat(name: str) -> None:
     name : str
         Name of the assistant without spaces.
     """
-    logging.info(f"Chatting with {name}")
+    logging.info("Chatting with %s", name)

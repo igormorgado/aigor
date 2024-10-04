@@ -1,14 +1,13 @@
 """Commom utilities"""
 
 import sys
-from rich.logging import RichHandler
 import logging
-from rich.console import Console
-from pathlib import Path
 from typing import Callable, TextIO, Any
+from pathlib import Path
+from rich.logging import RichHandler
+from rich.console import Console
 import yaml
 from dotenv import load_dotenv
-
 import typer
 
 from aigor import __appname__
@@ -91,15 +90,15 @@ def search_and_load_dotenv() -> None:
     loaded_dotenv = False
     locations = [Path("."), Path.home()]
     for location in locations:
-        logging.debug(f"Trying to read .env from {location}")
+        logging.debug("Trying to read .env from %s", location)
         if load_dotenv(location / ".env"):
             loaded_dotenv = True
             break
 
     if loaded_dotenv:
-        logging.debug(f"Loaded `.env` from {location}")
+        logging.debug("Loaded `.env` from %s", location)
     else:
-        logging.warn("Could not find .env file.")
+        logging.warning("Could not find .env file.")
 
 
 def args_to_dict(args: list[str]) -> dict[str, str]:
