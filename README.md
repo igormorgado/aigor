@@ -49,7 +49,13 @@ pip install .
 
 ## Usage
 
+First you need to setup local environment variable with your Anthropic or OpenAI
+key. The variable names are respectively: 
 
+ - ANTHROPIC_API_KEY, for the Anthropic Key
+ - OPENAI_API_KEY, for the OpenAI Key
+
+Then...
 
 ### Get help
 
